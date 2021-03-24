@@ -1,24 +1,89 @@
 # NgAutoCancelable
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.1.2.
+NgAutoCancelable decorator use for auto cancel http request on component destroy with some additional benefits.
 
-## Code scaffolding
+## Installation
+```console
+npm i ng-auto-cancelable
+```
 
-Run `ng generate component component-name --project ng-auto-cancelable` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ng-auto-cancelable`.
-> Note: Don't forget to add `--project ng-auto-cancelable` or else it will be added to the default project in your `angular.json` file. 
+## Uses
+```console
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { ngAutoCancelable } from 'ng-auto-cancelable';
 
-## Build
+@Component({
+  selector: 'app-fetch-api',
+  templateUrl: './fetch-api.component.html',
+  styleUrls: ['./fetch-api.component.scss']
+})
+export class FetchApiComponent implements OnInit {
+  
+  constructor(private httpClient: HttpClient) { }
 
-Run `ng build ng-auto-cancelable` to build the project. The build artifacts will be stored in the `dist/` directory.
+  ngOnInit(): void {
+    this.fetchData();
+  }
 
-## Publishing
+  @ngAutoCancelable()
+  fetchData() {
+    return this.httpClient
+      .get(
+        "https://api.spotify.com/v1/albums"
+      )
+      .subscribe(
+        (res) => {
+          console.log(res);
+        }
+      );
+  }
+}
+```
 
-After building your library with `ng build ng-auto-cancelable`, go to the dist folder `cd dist/ng-auto-cancelable` and run `npm publish`.
+## Extra Benefits
+ngAutoCancelable decorator accept one or two arguments:
+1. takeLatest (Default = true): This argument ensure to cancel prior scheduled request if same request trigger again.
+2. autoCancelTimeout (Optional argument): This argument ensure to cancel request after given timeout. Timeout value must be in milliseconds.
 
-## Running unit tests
+### Example
 
-Run `ng test ng-auto-cancelable` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```console
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { ngAutoCancelable } from 'ng-auto-cancelable';
 
-## Further help
+@Component({
+  selector: 'app-fetch-api',
+  templateUrl: './fetch-api.component.html',
+  styleUrls: ['./fetch-api.component.scss']
+})
+export class FetchApiComponent implements OnInit {
+  
+  constructor(private httpClient: HttpClient) { }
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+  ngOnInit(): void {
+    this.fetchData();   // schedule 1st request
+    // takeLatest will work
+    this.fetchData();   // schedule 2nd request (cancel 1st request before schedule this)
+    this.fetchData();   // schedule 3rd request (cancel 2st request before schedule this)
+  }
+
+  // If API response will not coming in 10000 ms then request automatically canceled.
+  @ngAutoCancelable(true, 10000)
+  fetchData() {
+    return this.httpClient
+      .get(
+        "https://api.spotify.com/v1/albums"
+      )
+      .subscribe(
+        (res) => {
+          console.log(res);
+        }
+      );
+  }
+}
+```
+
+## License
+ngAutoCancelable is licensed under a [Mozilla Public License](https://github.com/rawatsandeep670/ng-auto-cancelable/blob/main/LICENSE).
