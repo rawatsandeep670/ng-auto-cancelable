@@ -1,7 +1,7 @@
 {
   "name": "ng-auto-cancelable",
   "description": "Http request auto cancelable on component destroy in angular wit some addition benefits",
-  "version": "0.0.1",
+  "version": "1.1.0",
   "author": {
     "name": "Sandeep Singh",
     "email": "rawatsandeep670@gmail.com",
@@ -15,5 +15,11 @@
   "dependencies": {
     "tslib": "^2.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rawatsandeep670/ng-auto-cancelable"
+  },
+  "homepage": "https://github.com/rawatsandeep670/ng-auto-cancelable#readme",
+  "license": "Mozilla Public License",
   "keywords": ["angular", "angular 6", "angular 7", "angular 8", "angular 10", "angular 11", "auto-cancelation", "http-client-auto-cancel", "http-client", "api-cancel-on-component-destroy", "request-auto-cancel", "http-auto-cancel"]
 }
