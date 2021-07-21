@@ -1,7 +1,7 @@
 {
   "name": "ng-auto-cancelable",
   "description": "Http request auto cancelable on component destroy in angular wit some addition benefits",
-  "version": "1.3.0",
+  "version": "2.1.0",
   "author": {
     "name": "Sandeep Singh",
     "email": "rawatsandeep670@gmail.com",
