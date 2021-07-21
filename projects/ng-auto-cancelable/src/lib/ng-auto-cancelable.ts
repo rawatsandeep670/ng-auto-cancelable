@@ -1,5 +1,7 @@
 import { Subscription, timer } from "rxjs";
 
+const cancelOnDestroyMap: Map<Object, Array<CallableFunction>> = new Map();
+
 /**
  * HttpClient request auto cancel on component destroy with some addition benefits.
  * 
@@ -73,6 +75,15 @@ export function ngAutoCancelable(takeLatest = true, autoCancelTimeout?: number) 
     }
 
     /**
+     * update cancelRequest map object.
+     */
+    function updateCancelMap() {
+      const targetMap = cancelOnDestroyMap.get(target) || [];
+      targetMap.push(cancelRequest);
+      cancelOnDestroyMap.set(target, targetMap);
+    }
+
+    /**
      * Auto cancel timer clear if any.
      */
     function clearTimer() {
@@ -84,15 +95,25 @@ export function ngAutoCancelable(takeLatest = true, autoCancelTimeout?: number) 
     /**
      * Attached ngOnDestroy component lifecycle function inside target component.
      */
-    Object.defineProperty(target, "ngOnDestroy", {
-      value: function ngOnDestroy() {
-        cancelRequest();
-        if (typeof originalOnDestroy === 'function') {
-          originalOnDestroy.apply(this);
-        }
-      }
-    });
+    if (!cancelOnDestroyMap.has(target)) {
+      Object.defineProperty(target, "ngOnDestroy", {
+        value: function ngOnDestroy() {
+          
+          // cancel all the request associate with the component.
+          for (const cancelRequestRef of cancelOnDestroyMap.get(target) || []) {
+            cancelRequestRef();
+          }
+          cancelOnDestroyMap.delete(target);
 
+          if (typeof originalOnDestroy === 'function') {
+            originalOnDestroy.apply(this);
+          }
+        }
+      });
+    }
+
+    updateCancelMap();
+    
     // return descriptor with new value
     return descriptor;
   };
